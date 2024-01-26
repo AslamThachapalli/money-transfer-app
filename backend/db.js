@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const { Schema } = require('zod');
 
 mongoose.connect('mongodb+srv://aslamdevelop:Ass5Mongo@cluster0.vryu7ml.mongodb.net/');
 
@@ -43,9 +44,22 @@ userSchema.methods.createHash = async (password) => {
 }
 
 userSchema.methods.compareHash = async (passwordToCompare, password) => {
-    console.log(passwordToCompare)
-    console.log(password)
     return await bcrypt.compare(passwordToCompare, password);
 }
 
-module.exports.User = mongoose.model('/PaytmUser', userSchema);
+const accountSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    balance: {
+        type: Number,
+        required: true,
+    }
+})
+
+const User = mongoose.model('/PaytmUser', userSchema);
+const Account = mongoose.model('/accounts', accountSchema);
+
+module.exports = { User, Account }

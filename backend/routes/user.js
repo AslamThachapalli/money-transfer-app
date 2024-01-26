@@ -1,11 +1,35 @@
 const { Router } = require('express');
-const {signUpBody, signInBody} = require('../validations/user');
-const { User } = require('../db');
+const { signUpBody, signInBody, updateBody } = require('../validations/user');
+const { User, Account } = require('../db');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 const router = Router();
 
+router.put('/', authMiddleware, async (req, res) => {
+    const password = req.body.password;
+    const parsedBody = updateBody.safeParse(req.body);
+
+    if (!parsedBody.success) {
+        return res.status(411).json({
+            message: parsedBody.error.errors[0].message,
+        })
+    }
+
+    const user = await User.findById(req.userId).exec();
+
+    if (password) {
+        const hashPassword = await user.createHash(password);
+        req.body.password = hashPassword;
+    }
+
+    await User.updateOne({ _id: req.userId }, req.body);
+
+    res.json({
+        message: 'Updated successfully'
+    })
+})
 
 router.post('/signup', async (req, res) => {
     const reqBody = req.body;
@@ -39,6 +63,10 @@ router.post('/signup', async (req, res) => {
     }
 
     const user = await newUser.save();
+    await Account.create({
+        userId: user._id,
+        balance: 1 + Math.random() * 10000
+    })
     const token = jwt.sign({ userId: user._id }, JWT_SECRET)
 
     res.status(201).json({
@@ -51,15 +79,16 @@ router.post('/signin', async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
-    let {success} = signInBody.safeParse(req.body);
+    let { success } = signInBody.safeParse(req.body);
 
-    if(!success){
+    if (!success) {
         return res.status(400).json({
             message: 'Invalid inputs'
         })
     }
 
     let user = await User.findOne({ username: username })
+    console.log(user)
 
     if (user == null) {
         return res.status(400).json({
@@ -69,7 +98,7 @@ router.post('/signin', async (req, res) => {
         if (await user.compareHash(password, user.password)) {
             const token = jwt.sign({ userId: user._id }, JWT_SECRET);
             return res.status(200).json({ token })
-        }else{
+        } else {
             return res.status(400).json({
                 message: 'Invalid Credentials'
             })
@@ -78,8 +107,16 @@ router.post('/signin', async (req, res) => {
 
 })
 
-router.post('/update-info', (req, res) => {
+router.get('/bulk', (req, res) => {
+    const name = req.query.filter;
 
+    User.find().or([{ firstname: { $regex :name} }, { lastname: { $regex :name} }])
+        .select('firstname lastname _id')
+        .then(users => res.json({
+            users
+        })).catch(err => res.status(411).json({
+            message: 'Some unexpected error occurred'
+        }))
 })
 
 module.exports = router
