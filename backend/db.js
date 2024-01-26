@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const { Schema } = require('zod');
+const { MONGO_URL } = require('./secret');
 
-mongoose.connect('mongodb+srv://aslamdevelop:Ass5Mongo@cluster0.vryu7ml.mongodb.net/');
+mongoose.connect(MONGO_URL);
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -62,4 +62,4 @@ const accountSchema = new mongoose.Schema({
 const User = mongoose.model('/PaytmUser', userSchema);
 const Account = mongoose.model('/accounts', accountSchema);
 
-module.exports = { User, Account }
+module.exports = { User, Account, mongoose }
