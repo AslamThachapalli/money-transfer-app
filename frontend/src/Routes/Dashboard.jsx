@@ -9,9 +9,9 @@ export default function Dashboard() {
             <div className="bg-white h-screen w-full lg:w-8/12 py-6">
 
                 <DashboardHeader />
-                <AvailableBalance/>
+                <AvailableBalance />
 
-                <UsersList/>
+                <UsersList />
 
                 {/* <SendMoneyModal></SendMoneyModal> */}
 
