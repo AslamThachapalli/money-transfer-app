@@ -1,9 +1,10 @@
-export default function PaytmButton({buttonState, label, isSmallButton, btnColor, hoverColor, fontWeight }) {
+export default function PaytmButton({isLoading, label, isSmallButton, btnColor, hoverColor, fontWeight, onClick }) {
 
     return (
         <button className={`${isSmallButton ? '' : 'w-full'} ${btnColor ?? 'bg-black'} hover:${hoverColor ?? 'bg-gray-900'} text-white ${fontWeight ?? 'font-bold'} py-2 px-4 my-4 rounded focus:outline-none focus:shadow-outline`}
-            type="button">
-            {buttonState == 'loading' ? <Spinner /> : label}
+            type="button"
+            onClick={onClick}>
+            {isLoading ? <Spinner /> : label}
         </button>
     )
 }
