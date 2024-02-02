@@ -2,6 +2,8 @@ import SendMoneyModal from '../components/SendMoneyModal'
 import DashboardHeader from '../components/DahboardHeader'
 import AvailableBalance from '../components/AvailableBalance'
 import UsersList from '../components/UsersList'
+import { useRecoilValue } from 'recoil'
+import { initiateTransactionState } from '../store/atom/UserList'
 
 export default function Dashboard() {
     return (
@@ -13,9 +15,18 @@ export default function Dashboard() {
 
                 <UsersList />
 
-                {/* <SendMoneyModal></SendMoneyModal> */}
-
+                <DisplayModal/>
             </div>
         </div>
     )
+}
+
+function DisplayModal(){
+    const showModal = useRecoilValue(initiateTransactionState);
+
+    if(showModal){
+        return <SendMoneyModal/>
+    }else {
+        return null;
+    }
 }
