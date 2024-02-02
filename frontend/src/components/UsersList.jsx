@@ -36,31 +36,26 @@ function AllUsers() {
         case 'loading':
             return <div className="flex justify-center mt-6">Loading...</div>
         case 'hasValue':
-            return users.map((user) => {
-                <div className="flex justify-between items-center">
-                    <CircleAvatar
-                        label={`${user.firstname[0]}`}
-                        info={`${user.firstname}`} />
+            return (
+                <>
+                    {users.contents.map((user) => {
+                        return <div key={user._id} className="flex justify-between items-center">
+                            <CircleAvatar
+                                label={`${user.firstname[0]}`}
+                                info={`${user.firstname}`} />
 
-                    <PaytmButton
-                        label="Send Money"
-                        isSmallButton={true} />
-                </div>
-            });
+                            <PaytmButton
+                                label="Send Money"
+                                isSmallButton={true} 
+                                onClick={() => {
+                                    setInitiateTransaction(true);
+                                    setUserId(user._id);
+                                }}/>
+                        </div>
+                    })}
+                </>
+            );
         case 'hasError':
-            // return <div className="flex justify-center mt-6">Error Loading User Data</div>
-            return <div className="flex justify-between items-center">
-                <CircleAvatar
-                    label={`JD`}
-                    info={`master`} />
-
-                <PaytmButton
-                    label="Send Money"
-                    isSmallButton={true} 
-                    onClick={() => {
-                        setInitiateTransaction(true);
-                        setUserId('123');
-                    }}/>
-            </div>
+            return <div className="flex justify-center mt-6">Error Loading User Data</div>
     }
 }

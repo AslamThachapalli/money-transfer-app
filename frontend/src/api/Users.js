@@ -1,9 +1,10 @@
 export default async function getUsers(filter) {
     try {
+        const token = localStorage.getItem('token')
         const response = await fetch(`http://localhost:3000/api/v1/user/bulk?filter=${filter}`, {
-            method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             }
         })
 

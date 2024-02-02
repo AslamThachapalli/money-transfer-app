@@ -88,7 +88,6 @@ router.post('/signin', async (req, res) => {
     }
 
     let user = await User.findOne({ username: username })
-    console.log(user)
 
     if (user == null) {
         return res.status(400).json({
@@ -97,7 +96,12 @@ router.post('/signin', async (req, res) => {
     } else {
         if (await user.compareHash(password, user.password)) {
             const token = jwt.sign({ userId: user._id }, JWT_SECRET);
-            return res.status(200).json({ token })
+            return res.status(200).json({
+                username: user.username,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                token
+            })
         } else {
             return res.status(400).json({
                 message: 'Invalid Credentials'
@@ -107,14 +111,16 @@ router.post('/signin', async (req, res) => {
 
 })
 
-router.get('/bulk', (req, res) => {
+router.get('/bulk', authMiddleware, (req, res) => {
     const name = req.query.filter;
 
-    User.find().or([{ firstname: { $regex :name} }, { lastname: { $regex :name} }])
+    User.find().or([{ firstname: { $regex: name } }, { lastname: { $regex: name } }])
         .select('firstname lastname _id')
-        .then(users => res.json({
-            users
-        })).catch(err => res.status(411).json({
+        .then(users => {
+            const filteredUsers = users.filter(user => user._id != req.userId);
+
+            res.json({ users: filteredUsers })
+        }).catch(err => res.status(411).json({
             message: 'Some unexpected error occurred'
         }))
 })

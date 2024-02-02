@@ -3,6 +3,8 @@ import PaytmButton from "./PaytmButton";
 import PaytmInputField from "./PaytmInputField";
 import signIn from "../api/SignIn";
 import { useNavigate } from "react-router-dom";
+import { useSetRecoilState } from "recoil";
+import { signUpEmailState, signUpFirstnameState, signUpLastnameState } from "../store/atom/SignUp";
 
 export default function SignInForm() {
     const [email, setEmail] = useState('');
@@ -11,14 +13,22 @@ export default function SignInForm() {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
+    const setUsername = useSetRecoilState(signUpEmailState);
+    const setFirstname = useSetRecoilState(signUpFirstnameState);
+    const setLastname = useSetRecoilState(signUpLastnameState);
+
     const signInUser = async () =>{ 
         setIsLoading(true)
 
         try{
-            await signIn({
+            const userData = await signIn({
                 username: email,
                 password
             })
+            setUsername(userData.username)
+            setFirstname(userData.firstname)
+            setLastname(userData.lastname)
+
             setIsLoading(false);
             navigate('/dashboard');
         }catch(e){

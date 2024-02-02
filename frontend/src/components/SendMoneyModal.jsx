@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import CircleAvatar from "./CircleAvatar";
 import PaytmInputField from "./PaytmInputField";
 import PaytmButton from "./PaytmButton";
@@ -11,18 +11,23 @@ export default function SendMoneyModal() {
     const setInitiateTransaction = useSetRecoilState(initiateTransactionState);
     const [amount, setAmount] = useRecoilState(transferAmountState);
     const toUserId = useRecoilValue(toUserIdState)
-    const resetBalance = useRecoilState(shouldRefetchBalanceState)
+    const resetBalance = useSetRecoilState(shouldRefetchBalanceState)
+
+    const [isLoading, setIsLoading] = useState(false);
 
     async function sendMoney() {
         try {
+            setIsLoading(true);
             await transferMoney({
                 to: toUserId,
-                amount
+                amount: Number(amount)
             })
 
             setInitiateTransaction(false)
             resetBalance((state) => !state)
+            setIsLoading(false)
         } catch (e) {
+            setIsLoading(false)
             console.log(e);
         }
     }
@@ -51,11 +56,12 @@ export default function SendMoneyModal() {
                                 setValue={setAmount} />
 
                             <PaytmButton
+                                isLoading={isLoading}
                                 label="Initiate Transfer"
                                 btnColor="bg-green-500"
                                 hoverColor="bg-green-400"
-                                fontWeight="font-medium" 
-                                onClick={sendMoney}/>
+                                fontWeight="font-medium"
+                                onClick={sendMoney} />
                         </div>
                     </div>
                 </div>

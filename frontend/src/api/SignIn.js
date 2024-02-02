@@ -14,7 +14,11 @@ export default async function signIn(userData) {
         if (response.status == 200) {
             const jwt = data.token;
             localStorage.setItem('token', jwt);
-            return;
+            return {
+                username: data.username,
+                firstname: data.firstname,
+                lastname: data.lastname
+            };
         } else {
             throw new Error(data.message)
         }
